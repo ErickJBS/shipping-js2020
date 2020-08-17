@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -25,8 +26,12 @@ public class ShippingController {
     }
 
     @GetMapping(path = "types", produces = "application/json")
-    public List<PackageType> getPackageTypes() throws InvalidResponseException {
-        return service.getPackageTypes();
+    public List<String> getPackageTypes() throws InvalidResponseException {
+        List<String> responseTypes = new ArrayList<>();
+        for (PackageType packageType : service.getPackageTypes()) {
+            responseTypes.add(packageType.getDescription());
+        }
+        return responseTypes;
     }
 
     @ExceptionHandler(InvalidResponseException.class)
