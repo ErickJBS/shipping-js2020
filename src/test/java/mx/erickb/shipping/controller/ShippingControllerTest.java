@@ -29,7 +29,7 @@ public class ShippingControllerTest {
 
     @Test
     public void getPackageTypes_shouldReturnsPackages() throws Exception {
-        List<PackageType> types = new ArrayList<>();
+        List<String> types = new ArrayList<>();
         when(shippingService.getPackageTypes()).thenReturn(types);
 
         mockMvc.perform(get("/types"))

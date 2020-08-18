@@ -2,7 +2,6 @@ package mx.erickb.shipping.controller;
 
 import mx.erickb.shipping.exception.InvalidResponseException;
 import mx.erickb.shipping.model.ErrorResponse;
-import mx.erickb.shipping.model.PackageType;
 import mx.erickb.shipping.service.IShippingService;
 import mx.erickb.shipping.service.ShippingService;
 import org.springframework.http.HttpStatus;
@@ -12,11 +11,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin
 public class ShippingController {
 
     private final IShippingService service;
@@ -25,13 +25,9 @@ public class ShippingController {
         this.service = service;
     }
 
-    @GetMapping(path = "types", produces = "application/json")
+    @GetMapping(path = "types", produces = APPLICATION_JSON_VALUE)
     public List<String> getPackageTypes() throws InvalidResponseException {
-        List<String> responseTypes = new ArrayList<>();
-        for (PackageType packageType : service.getPackageTypes()) {
-            responseTypes.add(packageType.getDescription());
-        }
-        return responseTypes;
+        return service.getPackageTypes();
     }
 
     @ExceptionHandler(InvalidResponseException.class)
