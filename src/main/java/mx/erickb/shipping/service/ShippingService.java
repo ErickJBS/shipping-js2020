@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import mx.erickb.shipping.amqp.RabbitMqSender;
 import mx.erickb.shipping.exception.InvalidResponseException;
+import mx.erickb.shipping.model.PackageSize;
 import mx.erickb.shipping.model.PackageType;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -35,6 +36,23 @@ public class ShippingService implements IShippingService {
             PackageType[] types = mapper.readValue(response, PackageType[].class);
             return Arrays.stream(types)
                     .map(PackageType::getDescription)
+                    .collect(Collectors.toList());
+        } catch (JsonProcessingException e) {
+            logger.error("Error when processing server response (" + e.getMessage() + ")");
+            throw new InvalidResponseException("Invalid response: \"" + response + '"');
+        }
+    }
+
+    public List<String> getPackageSizes(String packageType) throws InvalidResponseException {
+        JSONObject request = new JSONObject()
+                .put("type", "packageSizeByType")
+                .put("packageType", packageType);
+        String response = sender.sendRequest(request.toString());
+
+        try {
+            PackageSize[] types = mapper.readValue(response, PackageSize[].class);
+            return Arrays.stream(types)
+                    .map(PackageSize::getDescription)
                     .collect(Collectors.toList());
         } catch (JsonProcessingException e) {
             logger.error("Error when processing server response (" + e.getMessage() + ")");

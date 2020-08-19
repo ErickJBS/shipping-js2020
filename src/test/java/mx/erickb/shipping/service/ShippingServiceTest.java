@@ -48,4 +48,31 @@ public class ShippingServiceTest {
         assertNotNull(types);
         assertFalse(types.isEmpty());
     }
+
+    @Test
+    public void getPackageSizes_shouldThrowInvalidResponseException() {
+        when(sender.sendRequest(anyString())).thenReturn("");
+
+        assertThrows(InvalidResponseException.class, () -> {
+            service.getPackageSizes("");
+        });
+    }
+
+    @Test
+    public void getPackageSizes_shouldReturnEmptyList() throws InvalidResponseException {
+        when(sender.sendRequest(anyString())).thenReturn("[]");
+
+        List<String> sizes = service.getPackageSizes("test");
+        assertNotNull(sizes);
+        assertTrue(sizes.isEmpty());
+    }
+
+    @Test
+    public void getPackageSizes_shouldReturnPackageSizes() throws InvalidResponseException {
+        when(sender.sendRequest(anyString())).thenReturn("[{ \"id\": \"2\", \"description\": \"test\", \"priceFactor\": \"5\" }]");
+
+        List<String> sizes = service.getPackageSizes("test");
+        assertNotNull(sizes);
+        assertFalse(sizes.isEmpty());
+    }
 }
