@@ -22,7 +22,7 @@ public class RabbitMqSenderTest {
     private RabbitMqSender sender;
 
     @Test
-    public void sendRequest_shouldReturnNonEmptyResponseWhenRequestSucceed() {
+    public void sendRequestShouldReturnNonEmptyResponseWhenRequestSucceed() {
         String mockResponse = "[]";
         when(template.convertSendAndReceive(any())).thenReturn(mockResponse);
 
@@ -33,7 +33,7 @@ public class RabbitMqSenderTest {
     }
 
     @Test
-    public void sendRequest_shouldReturnEmptyResponseWhenRequestFails() {
+    public void sendRequestShouldReturnEmptyResponseWhenRequestFails() {
         when(template.convertSendAndReceive(any())).thenThrow(AmqpException.class);
 
         String request = "{ \"type\": \"packageType\" }";

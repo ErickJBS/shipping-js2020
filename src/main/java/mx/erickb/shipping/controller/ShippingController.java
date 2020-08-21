@@ -6,10 +6,7 @@ import mx.erickb.shipping.service.IShippingService;
 import mx.erickb.shipping.service.ShippingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,6 +25,11 @@ public class ShippingController {
     @GetMapping(path = "types", produces = APPLICATION_JSON_VALUE)
     public List<String> getPackageTypes() throws InvalidResponseException {
         return service.getPackageTypes();
+    }
+
+    @GetMapping(path = "sizes/{type}", produces = APPLICATION_JSON_VALUE)
+    public List<String> getPackageSizes(@PathVariable("type") String packageType) throws InvalidResponseException {
+        return service.getPackageSizes(packageType);
     }
 
     @ExceptionHandler(InvalidResponseException.class)
