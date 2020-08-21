@@ -43,4 +43,21 @@ public class ShippingControllerTest {
         mockMvc.perform(get("/types"))
                 .andExpect(status().isInternalServerError());
     }
+
+    @Test
+    public void getTransportVelocities_shouldReturnVelocities() throws Exception {
+        List<String> types = new ArrayList<>();
+        when(shippingService.getTransportVelocities()).thenReturn(types);
+
+        mockMvc.perform(get("/velocity"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getTransportVelocities_shouldThrowInvalidResponseException() throws Exception {
+        when(shippingService.getTransportVelocities()).thenThrow(InvalidResponseException.class);
+
+        mockMvc.perform(get("/velocity"))
+                .andExpect(status().isInternalServerError());
+    }
 }

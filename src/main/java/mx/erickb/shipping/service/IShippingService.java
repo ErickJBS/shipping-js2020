@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface IShippingService {
     List<String> getPackageTypes() throws InvalidResponseException;
+    List<String> getTransportVelocities() throws InvalidResponseException;
 }

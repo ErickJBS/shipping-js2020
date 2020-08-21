@@ -30,6 +30,11 @@ public class ShippingController {
         return service.getPackageTypes();
     }
 
+    @GetMapping(path = "velocity", produces = APPLICATION_JSON_VALUE)
+    public List<String> getTransportVelocities() throws InvalidResponseException {
+        return service.getTransportVelocities();
+    }
+
     @ExceptionHandler(InvalidResponseException.class)
     public ResponseEntity<ErrorResponse> handleException(InvalidResponseException exception) {
         ErrorResponse error = new ErrorResponse("Invalid server response", exception.getMessage());
