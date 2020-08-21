@@ -50,8 +50,8 @@ public class ShippingService implements IShippingService {
         String response = sender.sendRequest(request.toString());
 
         try {
-            PackageSize[] types = mapper.readValue(response, PackageSize[].class);
-            return Arrays.stream(types)
+            PackageSize[] sizes = mapper.readValue(response, PackageSize[].class);
+            return Arrays.stream(sizes)
                     .map(PackageSize::getDescription)
                     .collect(Collectors.toList());
         } catch (JsonProcessingException e) {

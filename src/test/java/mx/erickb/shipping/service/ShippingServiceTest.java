@@ -23,7 +23,7 @@ public class ShippingServiceTest {
     ShippingService service;
 
     @Test
-    public void getPackageTypes_shouldThrowInvalidResponseException() {
+    public void getPackageTypesShouldThrowInvalidResponseException() {
         when(sender.sendRequest(anyString())).thenReturn("");
 
         assertThrows(InvalidResponseException.class, () -> {
@@ -32,7 +32,7 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getPackageTypes_shouldReturnEmptyList() throws InvalidResponseException {
+    public void getPackageTypesShouldReturnEmptyList() throws InvalidResponseException {
         when(sender.sendRequest(anyString())).thenReturn("[]");
 
         List<String> types = service.getPackageTypes();
@@ -41,7 +41,7 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getPackageTypes_shouldReturnPackageTypes() throws InvalidResponseException {
+    public void getPackageTypesShouldReturnPackageTypes() throws InvalidResponseException {
         when(sender.sendRequest(anyString())).thenReturn("[{ \"id\": \"2\", \"description\": \"test\", \"price\": \"10\" }]");
 
         List<String> types = service.getPackageTypes();
@@ -50,7 +50,7 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getPackageSizes_shouldThrowInvalidResponseException() {
+    public void getPackageSizesShouldThrowInvalidResponseException() {
         when(sender.sendRequest(anyString())).thenReturn("");
 
         assertThrows(InvalidResponseException.class, () -> {
@@ -59,7 +59,7 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getPackageSizes_shouldReturnEmptyList() throws InvalidResponseException {
+    public void getPackageSizesShouldReturnEmptyList() throws InvalidResponseException {
         when(sender.sendRequest(anyString())).thenReturn("[]");
 
         List<String> sizes = service.getPackageSizes("test");
@@ -68,7 +68,7 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getPackageSizes_shouldReturnPackageSizes() throws InvalidResponseException {
+    public void getPackageSizesShouldReturnPackageSizes() throws InvalidResponseException {
         when(sender.sendRequest(anyString())).thenReturn("[{ \"id\": \"2\", \"description\": \"test\", \"priceFactor\": \"5\" }]");
 
         List<String> sizes = service.getPackageSizes("test");

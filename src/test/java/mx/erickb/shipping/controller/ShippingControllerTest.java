@@ -28,7 +28,7 @@ public class ShippingControllerTest {
     MockMvc mockMvc;
 
     @Test
-    public void getPackageTypes_shouldReturnPackages() throws Exception {
+    public void getPackageTypesShouldReturnPackages() throws Exception {
         List<String> types = new ArrayList<>();
         when(shippingService.getPackageTypes()).thenReturn(types);
 
@@ -37,7 +37,7 @@ public class ShippingControllerTest {
     }
 
     @Test
-    public void getPackageTypes_shouldThrowInvalidResponseException() throws Exception {
+    public void getPackageTypesShouldThrowInvalidResponseException() throws Exception {
         when(shippingService.getPackageTypes()).thenThrow(InvalidResponseException.class);
 
         mockMvc.perform(get("/types"))
@@ -45,7 +45,7 @@ public class ShippingControllerTest {
     }
 
     @Test
-    public void getPackageSizes_shouldReturnSizes() throws Exception {
+    public void getPackageSizesShouldReturnSizes() throws Exception {
         List<String> sizes = new ArrayList<>();
         when(shippingService.getPackageSizes("testType")).thenReturn(sizes);
 
@@ -54,7 +54,7 @@ public class ShippingControllerTest {
     }
 
     @Test
-    public void getPackageSizes_shouldThrowInvalidResponseException() throws Exception {
+    public void getPackageSizesShouldThrowInvalidResponseException() throws Exception {
         when(shippingService.getPackageSizes(anyString())).thenThrow(InvalidResponseException.class);
 
         mockMvc.perform(get("/sizes/test"))
