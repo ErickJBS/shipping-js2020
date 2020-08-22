@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import mx.erickb.shipping.amqp.RabbitMqSender;
 import mx.erickb.shipping.exception.InvalidResponseException;
+import mx.erickb.shipping.model.PackageSize;
 import mx.erickb.shipping.model.PackageType;
 import mx.erickb.shipping.model.TransportVelocity;
+import mx.erickb.shipping.model.TransportType;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +54,39 @@ public class ShippingService implements IShippingService {
             TransportVelocity[] types = mapper.readValue(response, TransportVelocity[].class);
             return Arrays.stream(types)
                     .map(TransportVelocity::getDescription)
+                                  .collect(Collectors.toList());
+        } catch (JsonProcessingException e) {
+            logger.error("Error when processing server response (" + e.getMessage() + ")");
+            throw new InvalidResponseException("Invalid response: \"" + response + '"');
+        }
+    }
+  
+    public List<String> getPackageSizes(String packageType) throws InvalidResponseException {
+        JSONObject request = new JSONObject()
+                .put("type", "packageSizeByType")
+                .put("packageType", packageType);
+        String response = sender.sendRequest(request.toString());
+
+        try {
+            PackageSize[] sizes = mapper.readValue(response, PackageSize[].class);
+            return Arrays.stream(sizes)
+                    .map(PackageSize::getDescription)
+                    .collect(Collectors.toList());
+        } catch (JsonProcessingException e) {
+            logger.error("Error when processing server response (" + e.getMessage() + ")");
+            throw new InvalidResponseException("Invalid response: \"" + response + '"');
+        }
+    }
+
+    public List<String> getTransportTypes() throws InvalidResponseException {
+        JSONObject request = new JSONObject()
+                .put("type", "transportType");
+        String response = sender.sendRequest(request.toString());
+
+        try {
+            TransportType[] transportTypes = mapper.readValue(response, TransportType[].class);
+            return Arrays.stream(transportTypes)
+                    .map(TransportType::getDescription)
                     .collect(Collectors.toList());
         } catch (JsonProcessingException e) {
             logger.error("Error when processing server response (" + e.getMessage() + ")");
