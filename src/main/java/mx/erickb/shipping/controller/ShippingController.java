@@ -27,6 +27,11 @@ public class ShippingController {
         return service.getPackageTypes();
     }
 
+    @GetMapping(path = "velocity", produces = APPLICATION_JSON_VALUE)
+    public List<String> getTransportVelocities() throws InvalidResponseException {
+        return service.getTransportVelocities();
+    }
+  
     @GetMapping(path = "sizes/{type}", produces = APPLICATION_JSON_VALUE)
     public List<String> getPackageSizes(@PathVariable("type") String packageType) throws InvalidResponseException {
         return service.getPackageSizes(packageType);

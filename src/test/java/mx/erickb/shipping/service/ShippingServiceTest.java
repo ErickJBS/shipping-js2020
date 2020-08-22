@@ -50,6 +50,15 @@ public class ShippingServiceTest {
     }
 
     @Test
+    public void getTransportVelocitiesShouldThrowInvalidResponseException() {
+        when(sender.sendRequest(anyString())).thenReturn("");
+
+        assertThrows(InvalidResponseException.class, () -> {
+            service.getTransportVelocities();
+        });
+    }
+  
+    @Test
     public void getPackageSizesShouldThrowInvalidResponseException() {
         when(sender.sendRequest(anyString())).thenReturn("");
 
@@ -58,6 +67,15 @@ public class ShippingServiceTest {
         });
     }
 
+    @Test
+    public void getTransportVelocitiesShouldReturnEmptyList() throws InvalidResponseException {
+        when(sender.sendRequest(anyString())).thenReturn("[]");
+
+        List<String> types = service.getTransportVelocities();
+        assertNotNull(types);
+        assertTrue(types.isEmpty());
+    }
+  
     @Test
     public void getTransportTypesShouldThrowInvalidResponseException() {
         when(sender.sendRequest(anyString())).thenReturn("");
@@ -94,6 +112,15 @@ public class ShippingServiceTest {
         assertTrue(types.isEmpty());
     }
 
+    @Test
+    public void getTransportVelocitiesShouldReturnPackageTypes() throws InvalidResponseException {
+        when(sender.sendRequest(anyString())).thenReturn("[{ \"id\": \"2\", \"description\": \"test\", \"priceFactor\": \"10\" }]");
+
+        List<String> types = service.getTransportVelocities();
+        assertNotNull(types);
+        assertFalse(types.isEmpty());
+    }
+  
     @Test
     public void getTransportTypesShouldReturnPackageTypes() throws InvalidResponseException {
         when(sender.sendRequest(anyString())).thenReturn("[{ \"id\": \"2\", \"description\": \"test\", \"pricePerMile\": \"10\" }]");

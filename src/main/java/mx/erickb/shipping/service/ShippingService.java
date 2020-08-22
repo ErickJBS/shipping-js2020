@@ -6,6 +6,7 @@ import mx.erickb.shipping.amqp.RabbitMqSender;
 import mx.erickb.shipping.exception.InvalidResponseException;
 import mx.erickb.shipping.model.PackageSize;
 import mx.erickb.shipping.model.PackageType;
+import mx.erickb.shipping.model.TransportVelocity;
 import mx.erickb.shipping.model.TransportType;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -44,6 +45,22 @@ public class ShippingService implements IShippingService {
         }
     }
 
+    public List<String> getTransportVelocities() throws InvalidResponseException {
+        JSONObject request = new JSONObject()
+                .put("type", "transportVelocity");
+        String response = sender.sendRequest(request.toString());
+
+        try {
+            TransportVelocity[] types = mapper.readValue(response, TransportVelocity[].class);
+            return Arrays.stream(types)
+                    .map(TransportVelocity::getDescription)
+                                  .collect(Collectors.toList());
+        } catch (JsonProcessingException e) {
+            logger.error("Error when processing server response (" + e.getMessage() + ")");
+            throw new InvalidResponseException("Invalid response: \"" + response + '"');
+        }
+    }
+  
     public List<String> getPackageSizes(String packageType) throws InvalidResponseException {
         JSONObject request = new JSONObject()
                 .put("type", "packageSizeByType")
