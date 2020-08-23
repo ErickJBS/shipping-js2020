@@ -27,19 +27,19 @@ public class ShippingController {
         return service.getPackageTypes();
     }
 
-    @GetMapping(path = "velocity", produces = APPLICATION_JSON_VALUE)
-    public List<String> getTransportVelocities() throws InvalidResponseException {
-        return service.getTransportVelocities();
+    @GetMapping(path = "velocity/{transport}", produces = APPLICATION_JSON_VALUE)
+    public List<String> getTransportVelocities(@PathVariable("transport") String transportType) throws InvalidResponseException {
+        return service.getTransportVelocities(transportType);
     }
-  
+
     @GetMapping(path = "sizes/{type}", produces = APPLICATION_JSON_VALUE)
     public List<String> getPackageSizes(@PathVariable("type") String packageType) throws InvalidResponseException {
         return service.getPackageSizes(packageType);
     }
 
-    @GetMapping(path = "transport", produces = APPLICATION_JSON_VALUE)
-    public List<String> getTransportTypes() throws InvalidResponseException {
-        return service.getTransportTypes();
+    @GetMapping(path = "transport/{size}", produces = APPLICATION_JSON_VALUE)
+    public List<String> getTransportTypes(@PathVariable("size") String packageSize) throws InvalidResponseException {
+        return service.getTransportTypes(packageSize);
     }
 
     @ExceptionHandler(InvalidResponseException.class)

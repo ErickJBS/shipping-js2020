@@ -45,7 +45,7 @@ public class ShippingService implements IShippingService {
         }
     }
 
-    public List<String> getTransportVelocities() throws InvalidResponseException {
+    public List<String> getTransportVelocities(String transportType) throws InvalidResponseException {
         JSONObject request = new JSONObject()
                 .put("type", "transportVelocity");
         String response = sender.sendRequest(request.toString());
@@ -78,7 +78,7 @@ public class ShippingService implements IShippingService {
         }
     }
 
-    public List<String> getTransportTypes() throws InvalidResponseException {
+    public List<String> getTransportTypes(String packageSize) throws InvalidResponseException {
         JSONObject request = new JSONObject()
                 .put("type", "transportType");
         String response = sender.sendRequest(request.toString());

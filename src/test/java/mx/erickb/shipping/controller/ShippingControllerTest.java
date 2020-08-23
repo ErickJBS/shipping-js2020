@@ -47,51 +47,54 @@ public class ShippingControllerTest {
     @Test
     public void getTransportVelocitiesShouldReturnVelocities() throws Exception {
         List<String> types = new ArrayList<>();
-        when(shippingService.getTransportVelocities()).thenReturn(types);
+        when(shippingService.getTransportVelocities(anyString())).thenReturn(types);
 
-        mockMvc.perform(get("/velocity"))
+        mockMvc.perform(get("/velocity/testTransportType"))
                 .andExpect(status().isOk());
     }
-    
+
     @Test
     public void getPackageSizesShouldReturnSizes() throws Exception {
         List<String> sizes = new ArrayList<>();
-        when(shippingService.getPackageSizes("testType")).thenReturn(sizes);
+        when(shippingService.getPackageSizes(anyString())).thenReturn(sizes);
 
-        mockMvc.perform(get("/sizes/testType"))
+        mockMvc.perform(get("/sizes/testPackageType"))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void getTransportTypesShouldReturnPackages() throws Exception {
         List<String> types = new ArrayList<>();
-        when(shippingService.getTransportTypes()).thenReturn(types);
+        when(shippingService.getTransportTypes(anyString())).thenReturn(types);
 
-        mockMvc.perform(get("/transport"))
+        mockMvc.perform(get("/transport/testPackageSize"))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void getTransportVelocitiesShouldThrowInvalidResponseException() throws Exception {
-        when(shippingService.getTransportVelocities()).thenThrow(InvalidResponseException.class);
+        when(shippingService.getTransportVelocities(anyString()))
+                .thenThrow(InvalidResponseException.class);
 
-        mockMvc.perform(get("/velocity"))
+        mockMvc.perform(get("/velocity/testTransportType"))
                 .andExpect(status().isInternalServerError());
     }
-          
+
     @Test
     public void getPackageSizesShouldThrowInvalidResponseException() throws Exception {
-        when(shippingService.getPackageSizes(anyString())).thenThrow(InvalidResponseException.class);
+        when(shippingService.getPackageSizes(anyString()))
+                .thenThrow(InvalidResponseException.class);
 
-        mockMvc.perform(get("/sizes/test"))
+        mockMvc.perform(get("/sizes/testPackageType"))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void getTransportTypesShouldThrowInvalidResponseException() throws Exception {
-        when(shippingService.getTransportTypes()).thenThrow(InvalidResponseException.class);
+        when(shippingService.getTransportTypes(anyString()))
+                .thenThrow(InvalidResponseException.class);
 
-        mockMvc.perform(get("/transport"))
+        mockMvc.perform(get("/transport/testPackageSize"))
                 .andExpect(status().isInternalServerError());
     }
 }
