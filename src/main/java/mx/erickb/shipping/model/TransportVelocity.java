@@ -1,6 +1,6 @@
 package mx.erickb.shipping.model;
 
-public class TransportVelocity {
+public class TransportVelocity implements Describable {
     private long id;
     private String description;
     private double priceFactor;
@@ -36,5 +36,10 @@ public class TransportVelocity {
                 ", description='" + description + '\'' +
                 ", priceFactor=" + priceFactor +
                 '}';
+    }
+
+    @Override
+    public String describe() {
+        return getDescription();
     }
 }
