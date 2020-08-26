@@ -1,6 +1,6 @@
 package mx.erickb.shipping.model;
 
-public class PackageSize {
+public class PackageSize implements Describable {
     private long id;
     private String description;
     private double priceFactor;
@@ -36,5 +36,10 @@ public class PackageSize {
                 ", description='" + description + '\'' +
                 ", priceFactor=" + priceFactor +
                 '}';
+    }
+
+    @Override
+    public String describe() {
+        return getDescription();
     }
 }

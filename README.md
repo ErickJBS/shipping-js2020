@@ -14,5 +14,5 @@ Alternatively:
 $ mvn clean install  
 ```  
 ```bash  
-$ java -jar target/shortener-0.0.1-SNAPSHOT.jar  
+$ java -jar target/shipping-0.0.1-SNAPSHOT.jar  
 ```

@@ -1,6 +1,6 @@
 package mx.erickb.shipping.model;
 
-public class TransportType {
+public class TransportType implements Describable {
     private long id;
     private String description;
     private double pricePerMile;
@@ -36,5 +36,10 @@ public class TransportType {
                 ", description='" + description + '\'' +
                 ", pricePerMile=" + pricePerMile +
                 '}';
+    }
+
+    @Override
+    public String describe() {
+        return getDescription();
     }
 }
