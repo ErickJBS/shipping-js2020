@@ -7,7 +7,6 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,15 +14,11 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @PropertySource("classpath:amqp.properties")
+@ConfigurationProperties(prefix = "app")
 public class RabbitMqConfig {
 
-    @Value("${exchange-name}")
     private String exchangeName;
-
-    @Value("${queue-name}")
     private String queueName;
-
-    @Value("${routing-key}")
     private String routingKey;
 
     @Bean
@@ -57,5 +52,17 @@ public class RabbitMqConfig {
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(queueName);
         return container;
+    }
+
+    public void setExchangeName(String exchangeName) {
+        this.exchangeName = exchangeName;
+    }
+
+    public void setQueueName(String queueName) {
+        this.queueName = queueName;
+    }
+
+    public void setRoutingKey(String routingKey) {
+        this.routingKey = routingKey;
     }
 }

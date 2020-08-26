@@ -8,16 +8,12 @@ import mx.erickb.shipping.model.TransportType;
 import mx.erickb.shipping.model.TransportVelocity;
 import mx.erickb.shipping.util.ResponseMapper;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class ShippingService implements IShippingService {
-    private final Logger logger = LoggerFactory.getLogger(ShippingService.class);
-
     private final RabbitMqSender sender;
     private final ResponseMapper mapper;
 
