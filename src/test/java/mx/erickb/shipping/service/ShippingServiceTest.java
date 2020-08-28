@@ -113,7 +113,7 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getTransportVelocitiesShouldReturnPackageTypes() throws InvalidResponseException {
+    public void getTransportVelocitiesShouldReturnTransportVelocities() throws InvalidResponseException {
         when(sender.sendRequest(anyString())).thenReturn("[{ \"id\": \"2\", \"description\": \"test\", \"priceFactor\": \"10\" }]");
 
         List<String> types = service.getTransportVelocities("testTransportType");
@@ -122,11 +122,29 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getTransportTypesShouldReturnPackageTypes() throws InvalidResponseException {
+    public void getTransportTypesShouldReturnTransportTypes() throws InvalidResponseException {
         when(sender.sendRequest(anyString())).thenReturn("[{ \"id\": \"2\", \"description\": \"test\", \"pricePerMile\": \"10\" }]");
 
         List<String> types = service.getTransportTypes("testPackageSize");
         assertNotNull(types);
         assertFalse(types.isEmpty());
+    }
+
+    @Test
+    public void getCitiesShouldReturnCities() throws InvalidResponseException {
+        when(sender.sendRequest(anyString())).thenReturn("[{\"id\":33,\"name\":\"La Paz\",\"tax\":10,\"seaport\":true,\"airport\":true}]");
+
+        List<String> cities = service.getCities();
+        assertNotNull(cities);
+        assertFalse(cities.isEmpty());
+    }
+
+    @Test
+    public void getCitiesShouldThrowInvalidResponseException() {
+        when(sender.sendRequest(anyString())).thenReturn("");
+
+        assertThrows(InvalidResponseException.class, () -> {
+            service.getCities();
+        });
     }
 }

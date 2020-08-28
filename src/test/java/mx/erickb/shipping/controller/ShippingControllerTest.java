@@ -63,7 +63,7 @@ public class ShippingControllerTest {
     }
 
     @Test
-    public void getTransportTypesShouldReturnPackages() throws Exception {
+    public void getTransportTypesShouldReturnTransports() throws Exception {
         List<String> types = new ArrayList<>();
         when(shippingService.getTransportTypes(anyString())).thenReturn(types);
 
@@ -97,4 +97,23 @@ public class ShippingControllerTest {
         mockMvc.perform(get("/transport/testPackageSize"))
                 .andExpect(status().isInternalServerError());
     }
+
+    @Test
+    public void getCitiesShouldReturnCities() throws Exception {
+        List<String> cities = new ArrayList<>();
+        when(shippingService.getCities()).thenReturn(cities);
+
+        mockMvc.perform(get("/city"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getCitiesShouldThrowInvalidResponseException() throws Exception {
+        when(shippingService.getCities())
+                .thenThrow(InvalidResponseException.class);
+
+        mockMvc.perform(get("/city"))
+                .andExpect(status().isInternalServerError());
+    }
+
 }

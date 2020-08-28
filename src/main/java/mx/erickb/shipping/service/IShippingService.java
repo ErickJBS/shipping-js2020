@@ -9,4 +9,5 @@ public interface IShippingService {
     List<String> getTransportVelocities(String transportType) throws InvalidResponseException;
     List<String> getPackageSizes(String packageType) throws InvalidResponseException;
     List<String> getTransportTypes(String packageSize) throws InvalidResponseException;
+    List<String> getCities() throws InvalidResponseException;
 }
