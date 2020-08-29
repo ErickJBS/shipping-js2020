@@ -2,10 +2,7 @@ package mx.erickb.shipping.service;
 
 import mx.erickb.shipping.amqp.RabbitMqSender;
 import mx.erickb.shipping.exception.InvalidResponseException;
-import mx.erickb.shipping.model.PackageSize;
-import mx.erickb.shipping.model.PackageType;
-import mx.erickb.shipping.model.TransportType;
-import mx.erickb.shipping.model.TransportVelocity;
+import mx.erickb.shipping.model.*;
 import mx.erickb.shipping.util.ResponseMapper;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -53,5 +50,13 @@ public class ShippingService implements IShippingService {
         String response = sender.sendRequest(request.toString());
 
         return mapper.map(response, TransportType[].class);
+    }
+
+    public List<String> getCities() throws InvalidResponseException {
+        JSONObject request = new JSONObject()
+                .put("type", "city");
+        String response = sender.sendRequest(request.toString());
+
+        return mapper.map(response, City[].class);
     }
 }
