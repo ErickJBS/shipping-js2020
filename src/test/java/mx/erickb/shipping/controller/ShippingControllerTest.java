@@ -1,12 +1,16 @@
 package mx.erickb.shipping.controller;
 
+import mx.erickb.shipping.exception.InvalidRequestException;
 import mx.erickb.shipping.exception.InvalidResponseException;
+import mx.erickb.shipping.exception.NotFoundException;
 import mx.erickb.shipping.service.ShippingService;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -15,6 +19,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -116,4 +121,55 @@ public class ShippingControllerTest {
                 .andExpect(status().isInternalServerError());
     }
 
+    @Test
+    public void getRouteShouldReturnRoute() throws Exception {
+        String mockRoute = "test → test";
+        when(shippingService.getRoute(anyString(), anyString())).thenReturn(mockRoute);
+
+        String data = new JSONObject().put("origin", "testCity1")
+                .put("destination", "testCity2").toString();
+        mockMvc.perform(post("/route")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(data))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getRouteShouldThrowInvalidResponseException() throws Exception {
+        when(shippingService.getRoute(anyString(), anyString()))
+                .thenThrow(InvalidResponseException.class);
+
+        String data = new JSONObject().put("origin", "testCity1")
+                .put("destination", "testCity2").toString();
+        mockMvc.perform(post("/route")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(data))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void getRouteShouldThrowInvalidRequestException() throws Exception {
+        when(shippingService.getRoute(anyString(), anyString()))
+                .thenThrow(InvalidRequestException.class);
+
+        String data = new JSONObject().put("origin", "testCity")
+                .put("destination", "testCity").toString();
+        mockMvc.perform(post("/route")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(data))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void getRouteShouldThrowNotFoundException() throws Exception {
+        when(shippingService.getRoute(anyString(), anyString()))
+                .thenThrow(NotFoundException.class);
+
+        String data = new JSONObject().put("origin", "testCity1")
+                .put("destination", "testCity2").toString();
+        mockMvc.perform(post("/route")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(data))
+                .andExpect(status().isNotFound());
+    }
 }

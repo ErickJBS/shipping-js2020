@@ -1,16 +1,22 @@
 package mx.erickb.shipping.service;
 
 import mx.erickb.shipping.amqp.RabbitMqSender;
+import mx.erickb.shipping.exception.InvalidRequestException;
 import mx.erickb.shipping.exception.InvalidResponseException;
+import mx.erickb.shipping.exception.NotFoundException;
+import mx.erickb.shipping.util.route.RouteUtils;
+import mx.erickb.shipping.util.route.RoutesGraph;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -18,6 +24,9 @@ public class ShippingServiceTest {
 
     @MockBean
     RabbitMqSender sender;
+
+    @MockBean
+    RouteUtils routeUtils;
 
     @Autowired
     ShippingService service;
@@ -145,6 +154,59 @@ public class ShippingServiceTest {
 
         assertThrows(InvalidResponseException.class, () -> {
             service.getCities();
+        });
+    }
+
+    @Test
+    public void getRouteShouldReturnRoute() throws Exception {
+        List<String> cities = Arrays.asList("City1", "City2", "City3");
+        when(sender.sendRequest(anyString())).thenReturn("");
+        when(routeUtils.parseRoutes(anyString())).thenReturn(new ArrayList<>());
+        when(routeUtils.getRoutesGraph(anyList())).thenReturn(new RoutesGraph(cities));
+        when(
+                routeUtils.findOptimalRoute(
+                        any(RoutesGraph.class),
+                        anyString(),
+                        anyString()
+                )
+        ).thenReturn(cities);
+
+        String route = service.getRoute("origin", "destination");
+        assertEquals("City1 → City2 → City3", route);
+    }
+
+    @Test
+    public void getRouteShouldThrowInvalidRequestException() {
+        assertThrows(InvalidRequestException.class, () -> {
+            service.getRoute("origin", "origin");
+        });
+    }
+
+    @Test
+    public void getRouteShouldThrowInvalidResponseException() throws InvalidResponseException {
+        when(sender.sendRequest(anyString())).thenReturn("");
+        when(routeUtils.parseRoutes(anyString())).thenThrow(InvalidResponseException.class);
+
+        assertThrows(InvalidResponseException.class, () -> {
+            service.getRoute("origin", "destination");
+        });
+    }
+
+    @Test
+    public void getRouteShouldThrowNotFoundException() throws InvalidResponseException {
+        when(sender.sendRequest(anyString())).thenReturn("");
+        when(routeUtils.parseRoutes(anyString())).thenReturn(new ArrayList<>());
+        when(routeUtils.getRoutesGraph(anyList())).thenReturn(new RoutesGraph(new ArrayList<>()));
+        when(
+                routeUtils.findOptimalRoute(
+                        any(RoutesGraph.class),
+                        anyString(),
+                        anyString()
+                )
+        ).thenReturn(null);
+
+        assertThrows(NotFoundException.class, () -> {
+            service.getRoute("origin", "destination");
         });
     }
 }
