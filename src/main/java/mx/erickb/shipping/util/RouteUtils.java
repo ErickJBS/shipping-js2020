@@ -1,13 +1,19 @@
-package mx.erickb.shipping.util.route;
+package mx.erickb.shipping.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import mx.erickb.shipping.exception.InvalidResponseException;
+import mx.erickb.shipping.model.Route;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class RouteUtils {
@@ -19,7 +25,7 @@ public class RouteUtils {
         this.mapper = mapper;
     }
 
-    public List<Route> parseRoutes(String routesResponse) throws InvalidResponseException {
+    public List<Route> parseRoutesResponse(String routesResponse) {
         try {
             Route[] routes = mapper.readValue(routesResponse, Route[].class);
             return Arrays.asList(routes);
@@ -30,14 +36,11 @@ public class RouteUtils {
     }
 
     public RoutesGraph getRoutesGraph(List<Route> routes) {
-        // Count unique cities
-        Set<String> citiesSet = new HashSet<>();
-        for (Route route : routes) {
-            citiesSet.add(route.getFrom());
-            citiesSet.add(route.getTo());
-        }
+        // Get unique cities
+        List<String> cities = routes.stream()
+                .flatMap(route -> Stream.of(route.getTo(), route.getFrom()))
+                .distinct().collect(Collectors.toList());
 
-        List<String> cities = new ArrayList<>(citiesSet);
         RoutesGraph routesGraph = new RoutesGraph(cities);
         // Filling connections
         for (Route route : routes) {
@@ -46,17 +49,17 @@ public class RouteUtils {
         return routesGraph;
     }
 
-    public List<String> findOptimalRoute(RoutesGraph routesGraph, String origin, String destination) {
+    public Optional<List<String>> findOptimalRoute(RoutesGraph routesGraph, String origin, String destination) {
         return this.findOptimalRoute(new ArrayList<>(), routesGraph, origin, destination);
     }
 
     // Depth first search (recursive) to find route (weights are discarded)
-    private List<String> findOptimalRoute(List<String> currentRoute, RoutesGraph routesGraph, String currentCity, String destination) {
+    private Optional<List<String>> findOptimalRoute(List<String> currentRoute, RoutesGraph routesGraph, String currentCity, String destination) {
         // Clone current route to avoid interfering with recursion
         List<String> route = new ArrayList<>(currentRoute);
         route.add(currentCity);
         if (currentCity.equals(destination)) {
-            return route;
+            return Optional.of(route);
         }
 
         // Recursively visit each connected city
@@ -65,13 +68,13 @@ public class RouteUtils {
                 // Skip if already visited in current route (avoid cycles)
                 continue;
             }
-            List<String> result = findOptimalRoute(route, routesGraph, connectedCity, destination);
-            if (result != null) {
+            Optional<List<String>> result = findOptimalRoute(route, routesGraph, connectedCity, destination);
+            if (result.isPresent()) {
                 return result;
             }
         }
 
         // No route found
-        return null;
+        return Optional.empty();
     }
 }

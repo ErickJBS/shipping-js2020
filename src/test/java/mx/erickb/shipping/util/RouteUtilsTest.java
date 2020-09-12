@@ -1,34 +1,36 @@
-package mx.erickb.shipping.util.route;
+package mx.erickb.shipping.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import mx.erickb.shipping.exception.InvalidResponseException;
+import mx.erickb.shipping.model.Route;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class RouteUtilsTest {
 
-    @Autowired
-    RouteUtils routeUtils;
+    ObjectMapper mapper = new ObjectMapper();
+    RouteUtils routeUtils = new RouteUtils(mapper);
 
     @Test
     public void parseRoutesShouldReturnRoutes() throws InvalidResponseException {
         String response = "[{\"from\":\"Chihuahua\",\"to\":\"Durango\",\"distance\":\"36\"}," +
                 "{\"from\":\"Zacatecas\",\"to\":\"Toluca\",\"distance\":\"49\"}," +
                 "{\"from\":\"Toluca\",\"to\":\"Zacatecas\",\"distance\":\"69\"}]";
-        List<Route> routes = routeUtils.parseRoutes(response);
+        List<Route> routes = routeUtils.parseRoutesResponse(response);
         assertNotNull(routes);
         assertFalse(routes.isEmpty());
     }
 
     @Test
     public void parseRoutesShouldReturnEmptyList() throws InvalidResponseException {
-        List<Route> routes = routeUtils.parseRoutes("[]");
+        List<Route> routes = routeUtils.parseRoutesResponse("[]");
         assertNotNull(routes);
         assertTrue(routes.isEmpty());
     }
@@ -36,7 +38,7 @@ public class RouteUtilsTest {
     @Test
     public void parseRoutesShouldThrowInvalidResponseException() {
         assertThrows(InvalidResponseException.class, () -> {
-            routeUtils.parseRoutes("");
+            routeUtils.parseRoutesResponse("");
         });
     }
 
@@ -76,8 +78,9 @@ public class RouteUtilsTest {
         graph.addRoute("La Paz", "Hermosillo", 1);
         graph.addRoute("Torreon", "Veracruz", 1);
 
-        List<String> route = routeUtils.findOptimalRoute(graph, "La Paz", "Veracruz");
-        assertNotNull(route);
+        Optional<List<String>> routeOptional = routeUtils.findOptimalRoute(graph, "La Paz", "Veracruz");
+        assertTrue(routeOptional.isPresent());
+        List<String> route = routeOptional.get();
         assertEquals("La Paz", route.get(0));
         assertEquals("Veracruz", route.get(route.size() - 1));
     }
@@ -90,7 +93,7 @@ public class RouteUtilsTest {
         graph.addRoute("Chihuahua", "Hermosillo", 1);
         graph.addRoute("La Paz", "Hermosillo", 1);
 
-        List<String> route = routeUtils.findOptimalRoute(graph, "La Paz", "Veracruz");
-        assertNull(route);
+        Optional<List<String>> route = routeUtils.findOptimalRoute(graph, "La Paz", "Veracruz");
+        assertFalse(route.isPresent());
     }
 }

@@ -1,4 +1,4 @@
-package mx.erickb.shipping.util.route;
+package mx.erickb.shipping.util;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,17 +21,36 @@ public class RoutesGraphTest {
     }
 
     @Test
+    public void addsAndRemovesConnection() {
+        List<String> cities1 = routesGraph.getConnectedCities("Chihuahua");
+        List<String> cities2 = routesGraph.getConnectedCities("Cancun");
+        assertTrue(cities1.isEmpty());
+        assertTrue(cities2.isEmpty());
+
+        routesGraph.addRoute("Chihuahua", "Cancun", 0);
+        cities1 = routesGraph.getConnectedCities("Chihuahua");
+        cities2 = routesGraph.getConnectedCities("Cancun");
+        assertEquals(1, cities1.size());
+        assertEquals(1, cities2.size());
+
+        routesGraph.removeRoute("Chihuahua", "Cancun");
+        cities1 = routesGraph.getConnectedCities("Chihuahua");
+        cities2 = routesGraph.getConnectedCities("Cancun");
+        assertTrue(cities1.isEmpty());
+        assertTrue(cities2.isEmpty());
+    }
+
+    @Test
     public void getConnectedCitiesReturnConnectedCities() {
         routesGraph.addRoute("Chihuahua", "Torreon", 1);
         routesGraph.addRoute("Chihuahua", "Mazatlan", 1);
         routesGraph.addRoute("Chihuahua", "Cancun", 1);
-        routesGraph.removeRoute("Chihuahua", "Torreon");
 
         List<String> cities = routesGraph.getConnectedCities("Chihuahua");
-        assertEquals(2, cities.size());
         assertTrue(cities.contains("Mazatlan"));
         assertTrue(cities.contains("Cancun"));
-        assertFalse(cities.contains("Torreon"));
+        assertTrue(cities.contains("Torreon"));
+        assertFalse(cities.contains("Veracruz"));
     }
 
     @Test

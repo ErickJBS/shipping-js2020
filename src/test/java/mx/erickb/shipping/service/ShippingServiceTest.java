@@ -1,19 +1,20 @@
 package mx.erickb.shipping.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import mx.erickb.shipping.amqp.RabbitMqSender;
 import mx.erickb.shipping.exception.InvalidRequestException;
 import mx.erickb.shipping.exception.InvalidResponseException;
 import mx.erickb.shipping.exception.NotFoundException;
-import mx.erickb.shipping.util.route.RouteUtils;
-import mx.erickb.shipping.util.route.RoutesGraph;
+import mx.erickb.shipping.util.ResponseMapper;
+import mx.erickb.shipping.util.RouteUtils;
+import mx.erickb.shipping.util.RoutesGraph;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -22,14 +23,21 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 public class ShippingServiceTest {
 
-    @MockBean
+    @Mock
     RabbitMqSender sender;
 
-    @MockBean
+    @Mock
     RouteUtils routeUtils;
 
-    @Autowired
+    ObjectMapper mapper = new ObjectMapper();
+    ResponseMapper responseMapper = new ResponseMapper(mapper);
+
     ShippingService service;
+
+    @BeforeEach
+    public void init() {
+        service = new ShippingService(sender, responseMapper, routeUtils);
+    }
 
     @Test
     public void getPackageTypesShouldThrowInvalidResponseException() {
@@ -41,7 +49,7 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getPackageTypesShouldReturnEmptyList() throws InvalidResponseException {
+    public void getPackageTypesShouldReturnEmptyList() {
         when(sender.sendRequest(anyString())).thenReturn("[]");
 
         List<String> types = service.getPackageTypes();
@@ -50,7 +58,7 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getPackageTypesShouldReturnPackageTypes() throws InvalidResponseException {
+    public void getPackageTypesShouldReturnPackageTypes() {
         when(sender.sendRequest(anyString())).thenReturn("[{ \"id\": \"2\", \"description\": \"test\", \"price\": \"10\" }]");
 
         List<String> types = service.getPackageTypes();
@@ -77,7 +85,7 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getTransportVelocitiesShouldReturnEmptyList() throws InvalidResponseException {
+    public void getTransportVelocitiesShouldReturnEmptyList() {
         when(sender.sendRequest(anyString())).thenReturn("[]");
 
         List<String> types = service.getTransportVelocities("testTransportType");
@@ -95,7 +103,7 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getPackageSizesShouldReturnEmptyList() throws InvalidResponseException {
+    public void getPackageSizesShouldReturnEmptyList() {
         when(sender.sendRequest(anyString())).thenReturn("[]");
 
         List<String> sizes = service.getPackageSizes("testPackageType");
@@ -104,7 +112,7 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getPackageSizesShouldReturnPackageSizes() throws InvalidResponseException {
+    public void getPackageSizesShouldReturnPackageSizes() {
         when(sender.sendRequest(anyString())).thenReturn("[{ \"id\": \"2\", \"description\": \"test\", \"priceFactor\": \"5\" }]");
 
         List<String> sizes = service.getPackageSizes("testPackageType");
@@ -113,7 +121,7 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getTransportTypesShouldReturnEmptyList() throws InvalidResponseException {
+    public void getTransportTypesShouldReturnEmptyList() {
         when(sender.sendRequest(anyString())).thenReturn("[]");
 
         List<String> types = service.getTransportTypes("testPackageSize");
@@ -122,7 +130,7 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getTransportVelocitiesShouldReturnTransportVelocities() throws InvalidResponseException {
+    public void getTransportVelocitiesShouldReturnTransportVelocities() {
         when(sender.sendRequest(anyString())).thenReturn("[{ \"id\": \"2\", \"description\": \"test\", \"priceFactor\": \"10\" }]");
 
         List<String> types = service.getTransportVelocities("testTransportType");
@@ -131,7 +139,7 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getTransportTypesShouldReturnTransportTypes() throws InvalidResponseException {
+    public void getTransportTypesShouldReturnTransportTypes() {
         when(sender.sendRequest(anyString())).thenReturn("[{ \"id\": \"2\", \"description\": \"test\", \"pricePerMile\": \"10\" }]");
 
         List<String> types = service.getTransportTypes("testPackageSize");
@@ -140,7 +148,7 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getCitiesShouldReturnCities() throws InvalidResponseException {
+    public void getCitiesShouldReturnCities() {
         when(sender.sendRequest(anyString())).thenReturn("[{\"id\":33,\"name\":\"La Paz\",\"tax\":10,\"seaport\":true,\"airport\":true}]");
 
         List<String> cities = service.getCities();
@@ -158,10 +166,10 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getRouteShouldReturnRoute() throws Exception {
+    public void getRouteShouldReturnRoute() {
         List<String> cities = Arrays.asList("City1", "City2", "City3");
         when(sender.sendRequest(anyString())).thenReturn("");
-        when(routeUtils.parseRoutes(anyString())).thenReturn(new ArrayList<>());
+        when(routeUtils.parseRoutesResponse(anyString())).thenReturn(new ArrayList<>());
         when(routeUtils.getRoutesGraph(anyList())).thenReturn(new RoutesGraph(cities));
         when(
                 routeUtils.findOptimalRoute(
@@ -169,23 +177,37 @@ public class ShippingServiceTest {
                         anyString(),
                         anyString()
                 )
-        ).thenReturn(cities);
+        ).thenReturn(Optional.of(cities));
 
         String route = service.getRoute("origin", "destination");
         assertEquals("City1 → City2 → City3", route);
     }
 
     @Test
-    public void getRouteShouldThrowInvalidRequestException() {
+    public void getRouteShouldThrowInvalidRequestExceptionWhenOriginEqualsDestination() {
         assertThrows(InvalidRequestException.class, () -> {
             service.getRoute("origin", "origin");
         });
     }
 
     @Test
-    public void getRouteShouldThrowInvalidResponseException() throws InvalidResponseException {
+    public void getRouteShouldThrowInvalidRequestExceptionWhenNullOrigin() {
+        assertThrows(InvalidRequestException.class, () -> {
+            service.getRoute(null, "destination");
+        });
+    }
+
+    @Test
+    public void getRouteShouldThrowInvalidRequestExceptionWhenNullDestination() {
+        assertThrows(InvalidRequestException.class, () -> {
+            service.getRoute("origin", null);
+        });
+    }
+
+    @Test
+    public void getRouteShouldThrowInvalidResponseException() {
         when(sender.sendRequest(anyString())).thenReturn("");
-        when(routeUtils.parseRoutes(anyString())).thenThrow(InvalidResponseException.class);
+        when(routeUtils.parseRoutesResponse(anyString())).thenThrow(InvalidResponseException.class);
 
         assertThrows(InvalidResponseException.class, () -> {
             service.getRoute("origin", "destination");
@@ -193,9 +215,9 @@ public class ShippingServiceTest {
     }
 
     @Test
-    public void getRouteShouldThrowNotFoundException() throws InvalidResponseException {
+    public void getRouteShouldThrowNotFoundException() {
         when(sender.sendRequest(anyString())).thenReturn("");
-        when(routeUtils.parseRoutes(anyString())).thenReturn(new ArrayList<>());
+        when(routeUtils.parseRoutesResponse(anyString())).thenReturn(new ArrayList<>());
         when(routeUtils.getRoutesGraph(anyList())).thenReturn(new RoutesGraph(new ArrayList<>()));
         when(
                 routeUtils.findOptimalRoute(
@@ -203,7 +225,7 @@ public class ShippingServiceTest {
                         anyString(),
                         anyString()
                 )
-        ).thenReturn(null);
+        ).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> {
             service.getRoute("origin", "destination");

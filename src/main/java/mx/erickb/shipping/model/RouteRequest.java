@@ -1,4 +1,4 @@
-package mx.erickb.shipping.util.route;
+package mx.erickb.shipping.model;
 
 public class RouteRequest {
     private String origin;
