@@ -1,7 +1,10 @@
 package mx.erickb.shipping.controller;
 
+import mx.erickb.shipping.exception.InvalidRequestException;
 import mx.erickb.shipping.exception.InvalidResponseException;
+import mx.erickb.shipping.exception.NotFoundException;
 import mx.erickb.shipping.model.ErrorResponse;
+import mx.erickb.shipping.model.RouteRequest;
 import mx.erickb.shipping.service.IShippingService;
 import mx.erickb.shipping.service.ShippingService;
 import org.springframework.http.HttpStatus;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 @RestController
 @CrossOrigin
@@ -18,7 +22,7 @@ public class ShippingController {
 
     private final IShippingService service;
 
-    ShippingController(final ShippingService service) {
+    ShippingController(ShippingService service) {
         this.service = service;
     }
 
@@ -47,10 +51,26 @@ public class ShippingController {
         return service.getCities();
     }
 
+    @PostMapping(path = "route", produces = TEXT_PLAIN_VALUE)
+    public String getRoute(@RequestBody RouteRequest request) throws InvalidResponseException, InvalidRequestException, NotFoundException {
+        return service.getRoute(request.getOrigin(), request.getDestination());
+    }
+
     @ExceptionHandler(InvalidResponseException.class)
-    public ResponseEntity<ErrorResponse> handleException(InvalidResponseException exception) {
-        ErrorResponse error = new ErrorResponse("Invalid server response", exception.getMessage());
+    public ResponseEntity<ErrorResponse> handleInvalidResponseException(InvalidResponseException exception) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), exception.getMessage());
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRequestException(InvalidRequestException exception) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.getReasonPhrase(), exception.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException exception) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.NOT_FOUND.getReasonPhrase(), exception.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
 }

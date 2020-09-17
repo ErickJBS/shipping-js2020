@@ -1,11 +1,11 @@
 package mx.erickb.shipping.amqp;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -15,10 +15,10 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 public class RabbitMqSenderTest {
 
-    @MockBean
+    @Mock
     private RabbitTemplate template;
 
-    @Autowired
+    @InjectMocks
     private RabbitMqSender sender;
 
     @Test
