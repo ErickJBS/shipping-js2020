@@ -30,7 +30,7 @@ public class RouteUtils {
             Route[] routes = mapper.readValue(routesResponse, Route[].class);
             return Arrays.asList(routes);
         } catch (JsonProcessingException e) {
-            logger.error("Error when processing server response (" + e.getMessage() + ")");
+            logger.error("Error when processing server response", e);
             throw new InvalidResponseException("Invalid response: \"" + routesResponse + '"');
         }
     }

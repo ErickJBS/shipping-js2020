@@ -22,7 +22,7 @@ public class ShippingController {
 
     private final IShippingService service;
 
-    ShippingController(final ShippingService service) {
+    ShippingController(ShippingService service) {
         this.service = service;
     }
 

@@ -30,7 +30,7 @@ public class ShippingService implements IShippingService {
     private final ResponseMapper mapper;
     private final RouteUtils utils;
 
-    public ShippingService(final RabbitMqSender sender, final ResponseMapper mapper, final RouteUtils utils) {
+    public ShippingService(RabbitMqSender sender, ResponseMapper mapper, RouteUtils utils) {
         this.sender = sender;
         this.mapper = mapper;
         this.utils = utils;
@@ -86,7 +86,7 @@ public class ShippingService implements IShippingService {
             throw new InvalidRequestException("Null origin/destination provided");
         }
         if (origin.equals(destination)) {
-            logger.error("Origin cannot be equal to destination (" + origin + ")");
+            logger.error("Origin cannot be equal to destination ({})", origin);
             throw new InvalidRequestException("Origin cannot be equal to destination");
         }
         JSONObject request = new JSONObject()
