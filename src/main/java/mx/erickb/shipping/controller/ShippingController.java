@@ -27,32 +27,32 @@ public class ShippingController {
     }
 
     @GetMapping(path = "types", produces = APPLICATION_JSON_VALUE)
-    public List<String> getPackageTypes() throws InvalidResponseException {
+    public List<String> getPackageTypes() {
         return service.getPackageTypes();
     }
 
     @GetMapping(path = "velocity/{transport}", produces = APPLICATION_JSON_VALUE)
-    public List<String> getTransportVelocities(@PathVariable("transport") String transportType) throws InvalidResponseException {
+    public List<String> getTransportVelocities(@PathVariable("transport") String transportType) {
         return service.getTransportVelocities(transportType);
     }
 
     @GetMapping(path = "sizes/{type}", produces = APPLICATION_JSON_VALUE)
-    public List<String> getPackageSizes(@PathVariable("type") String packageType) throws InvalidResponseException {
+    public List<String> getPackageSizes(@PathVariable("type") String packageType) {
         return service.getPackageSizes(packageType);
     }
 
     @GetMapping(path = "transport/{size}", produces = APPLICATION_JSON_VALUE)
-    public List<String> getTransportTypes(@PathVariable("size") String packageSize) throws InvalidResponseException {
+    public List<String> getTransportTypes(@PathVariable("size") String packageSize) {
         return service.getTransportTypes(packageSize);
     }
 
     @GetMapping(path = "city", produces = APPLICATION_JSON_VALUE)
-    public List<String> getCities() throws InvalidResponseException {
+    public List<String> getCities() {
         return service.getCities();
     }
 
     @PostMapping(path = "route", produces = TEXT_PLAIN_VALUE)
-    public String getRoute(@RequestBody RouteRequest request) throws InvalidResponseException, InvalidRequestException, NotFoundException {
+    public String getRoute(@RequestBody RouteRequest request) {
         return service.getRoute(request.getOrigin(), request.getDestination());
     }
 
