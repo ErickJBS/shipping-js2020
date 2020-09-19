@@ -41,4 +41,11 @@ public class RoutesGraph {
         return new ArrayList<>(cities.keySet());
     }
 
+    public Integer getDistance(String origin, String destination) {
+        Map<String, Integer> originCity = adjacencyMatrix.get(origin);
+        if (originCity != null)
+            return originCity.get(destination);
+        return null;
+    }
+
 }

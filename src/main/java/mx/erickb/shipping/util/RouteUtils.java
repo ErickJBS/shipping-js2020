@@ -4,14 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import mx.erickb.shipping.exception.InvalidResponseException;
 import mx.erickb.shipping.model.Route;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,32 +47,37 @@ public class RouteUtils {
         return routesGraph;
     }
 
+    // Breadth-first search using priority queue
     public Optional<List<String>> findOptimalRoute(RoutesGraph routesGraph, String origin, String destination) {
-        return this.findOptimalRoute(new ArrayList<>(), routesGraph, origin, destination);
-    }
+        // Priority queue that returns min instead of max element
+        PriorityQueue<Pair<List<String>, Integer>> search
+                = new PriorityQueue<>(Comparator.comparing(Pair::getRight));
 
-    // Depth first search (recursive) to find route (weights are discarded)
-    private Optional<List<String>> findOptimalRoute(List<String> currentRoute, RoutesGraph routesGraph, String currentCity, String destination) {
-        // Clone current route to avoid interfering with recursion
-        List<String> route = new ArrayList<>(currentRoute);
-        route.add(currentCity);
-        if (currentCity.equals(destination)) {
-            return Optional.of(route);
-        }
+        // Inserting root node (BFS starting point)
+        search.add(Pair.of(Collections.singletonList(origin), 0));
 
-        // Recursively visit each connected city
-        for (String connectedCity : routesGraph.getConnectedCities(currentCity)) {
-            if (route.contains(connectedCity)) {
-                // Skip if already visited in current route (avoid cycles)
-                continue;
+        while (!search.isEmpty()) {
+            Pair<List<String>, Integer> currentNode = search.poll();
+            List<String> currentRoute = currentNode.getLeft();
+            String currentCity = currentRoute.get(currentRoute.size() - 1);
+            if (currentCity.equals(destination)) {
+                return Optional.of(currentRoute);
             }
-            Optional<List<String>> result = findOptimalRoute(route, routesGraph, connectedCity, destination);
-            if (result.isPresent()) {
-                return result;
+
+            // Add all the (non-visited) child nodes to the  search
+            Integer currentCost = currentNode.getRight();
+            for (String connectedCity : routesGraph.getConnectedCities(currentCity)) {
+                if (currentRoute.contains(connectedCity)) {
+                    // Skip if already visited in current route (avoid cycles)
+                    continue;
+                }
+                // Include connected city in current route
+                List<String> updatedRoute = new ArrayList<>(currentRoute);
+                updatedRoute.add(connectedCity);
+                Integer connectionCost = routesGraph.getDistance(currentCity, connectedCity);
+                search.add(Pair.of(updatedRoute, currentCost + connectionCost));
             }
         }
-
-        // No route found
         return Optional.empty();
     }
 }
