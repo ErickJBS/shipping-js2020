@@ -10,11 +10,13 @@ import mx.erickb.shipping.util.RouteUtils;
 import mx.erickb.shipping.util.RoutesGraph;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -29,6 +31,9 @@ public class ShippingServiceTest {
     @Mock
     RouteUtils routeUtils;
 
+    @Mock
+    RoutesManagerService routesManager;
+
     ObjectMapper mapper = new ObjectMapper();
     ResponseMapper responseMapper = new ResponseMapper(mapper);
 
@@ -36,7 +41,7 @@ public class ShippingServiceTest {
 
     @BeforeEach
     public void init() {
-        service = new ShippingService(sender, responseMapper, routeUtils);
+        service = new ShippingService(sender, responseMapper, routeUtils, routesManager);
     }
 
     @Test
@@ -172,7 +177,7 @@ public class ShippingServiceTest {
         when(routeUtils.parseRoutesResponse(anyString())).thenReturn(new ArrayList<>());
         when(routeUtils.getRoutesGraph(anyList())).thenReturn(new RoutesGraph(cities));
         when(
-                routeUtils.findOptimalRoute(
+                routesManager.findOptimalRoute(
                         any(RoutesGraph.class),
                         anyString(),
                         anyString()
@@ -220,7 +225,7 @@ public class ShippingServiceTest {
         when(routeUtils.parseRoutesResponse(anyString())).thenReturn(new ArrayList<>());
         when(routeUtils.getRoutesGraph(anyList())).thenReturn(new RoutesGraph(new ArrayList<>()));
         when(
-                routeUtils.findOptimalRoute(
+                routesManager.findOptimalRoute(
                         any(RoutesGraph.class),
                         anyString(),
                         anyString()

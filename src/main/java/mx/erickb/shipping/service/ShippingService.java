@@ -29,11 +29,13 @@ public class ShippingService implements IShippingService {
     private final RabbitMqSender sender;
     private final ResponseMapper mapper;
     private final RouteUtils utils;
+    private final IRoutesManagerService routesManager;
 
-    public ShippingService(RabbitMqSender sender, ResponseMapper mapper, RouteUtils utils) {
+    public ShippingService(RabbitMqSender sender, ResponseMapper mapper, RouteUtils utils, IRoutesManagerService routesManager) {
         this.sender = sender;
         this.mapper = mapper;
         this.utils = utils;
+        this.routesManager = routesManager;
     }
 
     public List<String> getPackageTypes() {
@@ -97,7 +99,7 @@ public class ShippingService implements IShippingService {
 
         List<Route> routes = utils.parseRoutesResponse(response);
         RoutesGraph routesGraph = utils.getRoutesGraph(routes);
-        Optional<List<String>> path = utils.findOptimalRoute(routesGraph, origin, destination);
+        Optional<List<String>> path = routesManager.findOptimalRoute(routesGraph, origin, destination);
 
         if (!path.isPresent()) {
             String msg = String.format("Route between %s and %s not found", origin, destination);
